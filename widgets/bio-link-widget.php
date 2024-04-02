@@ -150,28 +150,13 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'options' => [
                     'none' => __( 'None', 'biolink' ),
                     'facebook' => __( 'Facebook', 'biolink' ),
-                    'twitter' => __( 'Twitter', 'biolink' ),
+                    'x-twitter' => __( 'X-Twitter', 'biolink' ),
                     'instagram' => __( 'Instagram', 'biolink' ),
                     'linkedin' => __( 'LinkedIn', 'biolink' ),
                     'youtube' => __( 'YouTube', 'biolink' ),
-                    // We can add more social media options later on
+                    // We will add more here when I do the checks
                 ],
                 'default' => 'none',
-            ]
-        );
-
-        $repeater->add_control(
-            'icon',
-            [
-                'label' => __( 'Icon', 'biolink' ),
-                'type' => \Elementor\Controls_Manager::ICONS,
-                'default' => [
-                    'value' => 'fas fa-star',
-                    'library' => 'fa-solid',
-                ],
-                'condition' => [
-                    'social_media' => 'none',
-                ],
             ]
         );
 
@@ -197,7 +182,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::REPEATER,
                 'fields' => $repeater->get_controls(),
                 'default' => [],
-                'title_field' => '<# if (social_media !== "none") { #>{{{ social_media }}}<# } else { #>{{{ elementor.helpers.renderIcon( this, icon, {}, "i", "panel" ) || \'<i class="{{ icon.value }}"></i>\' }}}<# } #>',
+                'title_field' => '{{{ social_media }}}',
             ]
         );
 
@@ -307,7 +292,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 200,
+                    'size' => 115,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .bio-link-image img' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
@@ -636,7 +621,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __( 'Background Color', 'biolink' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#000000',
+                'default' => '#477ff8',
                 'selectors' => [
                     '{{WRAPPER}} .bio-link-cta' => 'background-color: {{VALUE}};',
                 ],
@@ -681,7 +666,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             [
                 'label' => __( 'Border Color', 'biolink' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#000000',
+                'default' => '#477ff8',
                 'selectors' => [
                     '{{WRAPPER}} .bio-link-cta' => 'border-color: {{VALUE}}; border-style: solid;',
                 ],
@@ -698,11 +683,11 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'label' => __( 'Corners', 'biolink' ),
                 'type' => \Elementor\Controls_Manager::SELECT,
                 'options' => [
-                    'square' => __( 'Square', 'biolink' ),
-                    'rounded' => __( 'Rounded', 'biolink' ),
-                    'round' => __( 'Round', 'biolink' ),
+                    '0' => __( 'Square', 'biolink' ),
+                    '10px' => __( 'Rounded', 'biolink' ),
+                    '50px' => __( 'Round', 'biolink' ),
                 ],
-                'default' => 'round',
+                'default' => '50px',
                 'selectors' => [
                     '{{WRAPPER}} .bio-link-cta' => 'border-radius: {{VALUE}};',
                 ],
@@ -994,7 +979,7 @@ protected function render() {
 
 	?>
 	<div <?php echo $this->get_render_attribute_string( 'bio-link-wrapper' ); ?>>
-		<div class="bio-link-content">
+		<div class="bio-link-content bio-link-content-centered">
 			<?php if ( 'profile' === $settings['image_style'] ) : ?>
 				<div class="bio-link-image">
 					<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $heading ); ?>">
@@ -1017,33 +1002,31 @@ protected function render() {
 				<?php endif; ?>
 			</div>
 
-			<?php if ( $social_icons ) : ?>
-				<div class="bio-link-social-icons">
-					<?php
-					foreach ( $social_icons as $index => $item ) {
-						$link_key = 'link_' . $index;
+            <?php if ( $social_icons ) : ?>
+                <div class="bio-link-social-icons">
+                    <?php
+                    foreach ( $social_icons as $index => $item ) {
+                        $link_key = 'link_' . $index;
 
-						$this->add_link_attributes( $link_key, $item['link'] );
-
-						$icon_class = '';
-						if ( 'none' !== $item['social_media'] ) {
-							$icon_class = 'bio-link-icon-' . $item['social_media'];
-						}
-
-						?>
-						<a <?php echo $this->get_render_attribute_string( $link_key ); ?> class="bio-link-icon <?php echo esc_attr( $icon_class ); ?>">
-							<?php
-							if ( 'none' === $item['social_media'] ) {
-								\Elementor\Icons_Manager::render_icon( $item['icon'], [ 'aria-hidden' => 'true' ] );
-							}
-							?>
-						</a>
-					<?php } ?>
-				</div>
-			<?php endif; ?>
+                        $this->add_link_attributes( $link_key, $item['link'] );
+                        
+                        $icon_class = '';
+                        if ( 'none' !== $item['social_media'] ) {
+                            $icon_class = 'bio-link-icon-' . $item['social_media'];
+                        }
+                        
+                        ?>
+                        <a <?php echo $this->get_render_attribute_string( $link_key ); ?> class="bio-link-icon <?php echo esc_attr( $icon_class ); ?>">
+                            <?php if ( 'none' !== $item['social_media'] ) : ?>
+                                <i class="fab fa-<?php echo esc_attr( $item['social_media'] ); ?>"></i>
+                            <?php endif; ?>
+                        </a>
+                    <?php } ?>
+                </div>
+            <?php endif; ?>
 
 			<?php if ( $cta_links ) : ?>
-				<div class="bio-link-cta-buttons">
+				<div class="bio-link-cta-buttons bio-link-cta-buttons-vertical">
 					<?php
 					foreach ( $cta_links as $index => $item ) {
 						$link_key = 'cta_link_' . $index;
@@ -1139,28 +1122,28 @@ protected function _content_template() {
 			</div>
 
 			<# if ( social_icons ) { #>
-				<div class="bio-link-social-icons">
-					<# _.each( social_icons, function( item, index ) { 
-						var link_key = 'link_' + index;
+                <div class="bio-link-social-icons">
+                    <# _.each( social_icons, function( item, index ) { 
+                        var link_key = 'link_' + index;
 
-						view.addRenderAttribute( link_key, item.link );
-
-						var icon_class = '';
-						if ( 'none' !== item.social_media ) {
-							icon_class = 'bio-link-icon-' + item.social_media;
-						}
-					#>
-						<a {{{ view.getRenderAttributeString( link_key ) }}} class="bio-link-icon {{ icon_class }}">
-							<# if ( 'none' === item.social_media ) { #>
-								{{{ elementor.helpers.renderIcon( view, item.icon, {}, 'i', 'object' ) }}}
-							<# } #>
-						</a>
-					<# } ); #>
-				</div>
-			<# } #>
+                        view.addRenderAttribute( link_key, item.link );
+                        
+                        var icon_class = '';
+                        if ( 'none' !== item.social_media ) {
+                            icon_class = 'bio-link-icon-' + item.social_media;
+                        }
+                    #>
+                        <a {{{ view.getRenderAttributeString( link_key ) }}} class="bio-link-icon {{ icon_class }}">
+                            <# if ( 'none' !== item.social_media ) { #>
+                                <i class="fab fa-{{ item.social_media }}"></i>
+                            <# } #>
+                        </a>
+                    <# } ); #>
+                </div>
+            <# } #>
 
 			<# if ( cta_links ) { #>
-				<div class="bio-link-cta-buttons">
+				<div class="bio-link-cta-buttons bio-link-cta-buttons-vertical">
 					<# _.each( cta_links, function( item, index ) {
 						var link_key = 'cta_link_' + index;
 
@@ -1199,3 +1182,4 @@ protected function _content_template() {
 	<?php
 }
 }
+

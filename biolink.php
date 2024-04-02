@@ -31,3 +31,11 @@ function register_bio_link( $widgets_manager ) {
 }
 
 add_action( 'elementor/widgets/register', 'register_bio_link' );
+
+/**
+ * Enqueue widget styles
+ */
+function enqueue_widget_styles() {
+    wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array(), '1.0.0', 'all' );
+}
+add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles' );
