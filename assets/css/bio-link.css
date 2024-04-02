@@ -1,0 +1,10 @@
+/* Icons Size */
+.bio-link-icon.small {
+    font-size: 16px;
+}
+.bio-link-icon.medium {
+    font-size: 24px;
+}
+.bio-link-icon.large {
+    font-size: 32px;
+}
