@@ -422,7 +422,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                         'font_size' => [
                             'default' => [
                                 'unit' => 'px',
-                                'size' => 24,
+                                'size' => 21,
                             ]
                         ]
                     ]
@@ -961,13 +961,15 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 <?php endif; ?>
     
                 <div class="bio-link-info">
-                    <?php if ( $heading ) : ?>
-                        <<?php echo esc_attr( $heading_tag ); ?> <?php echo $this->get_render_attribute_string( 'heading' ); ?>><?php echo wp_kses_post( $heading ); ?></<?php echo esc_attr( $heading_tag ); ?>>
-                    <?php endif; ?>
-    
-                    <?php if ( $title ) : ?>
-                        <<?php echo esc_attr( $title_tag ); ?> <?php echo $this->get_render_attribute_string( 'subheading' ); ?>><?php echo wp_kses_post( $title ); ?></<?php echo esc_attr( $title_tag ); ?>>
-                    <?php endif; ?>
+                    <div class="bio-link-heading-wrapper">
+                        <?php if ( $heading ) : ?>
+                            <<?php echo esc_attr( $heading_tag ); ?> <?php echo $this->get_render_attribute_string( 'heading' ); ?>><?php echo wp_kses_post( $heading ); ?></<?php echo esc_attr( $heading_tag ); ?>>
+                        <?php endif; ?>
+        
+                        <?php if ( $title ) : ?>
+                            <<?php echo esc_attr( $title_tag ); ?> <?php echo $this->get_render_attribute_string( 'subheading' ); ?>><?php echo wp_kses_post( $title ); ?></<?php echo esc_attr( $title_tag ); ?>>
+                        <?php endif; ?>
+                    </div>
     
                     <?php if ( $description ) : ?>
                         <div <?php echo $this->get_render_attribute_string( 'description' ); ?>><?php echo wp_kses_post( $description ); ?></div>
@@ -1056,13 +1058,15 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 <# } #>
     
                 <div class="bio-link-info">
-                    <# if ( heading ) { #>
-                        <{{{ heading_tag }}} {{{ view.getRenderAttributeString( 'heading' ) }}}>{{{ heading }}}</{{{ heading_tag }}}>
-                    <# } #>
-    
-                    <# if ( title ) { #>
-                        <{{{ title_tag }}} {{{ view.getRenderAttributeString( 'subheading' ) }}}>{{{ title }}}</{{{ title_tag }}}>
-                    <# } #>
+                    <div class="bio-link-heading-wrapper">
+                        <# if ( heading ) { #>
+                            <{{{ heading_tag }}} {{{ view.getRenderAttributeString( 'heading' ) }}}>{{{ heading }}}</{{{ heading_tag }}}>
+                        <# } #>
+        
+                        <# if ( title ) { #>
+                            <{{{ title_tag }}} {{{ view.getRenderAttributeString( 'subheading' ) }}}>{{{ title }}}</{{{ title_tag }}}>
+                        <# } #>
+                    </div>
     
                     <# if ( description ) { #>
                         <div {{{ view.getRenderAttributeString( 'description' ) }}}>{{{ description }}}</div>

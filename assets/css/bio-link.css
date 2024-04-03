@@ -64,10 +64,18 @@
     text-decoration: none;
   }
   
-/* Heading and Subheaidn spacing */
-.bio-link-info {
-  display: flex;
-  flex-direction: column; 
-  gap: 4px;
+/* Full width control */
+.bio-link-full-width {
+  width: 100%;
+}
 
+.bio-link-full-width .bio-link-content {
+  max-width: 100%;
+}
+
+/* Heading and Subheding */
+.bio-link-heading-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1px !important;
 }

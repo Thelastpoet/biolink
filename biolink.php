@@ -39,3 +39,4 @@ function enqueue_widget_styles() {
     wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array( 'elementor-frontend' ), '1.0.0', 'all' );
 }
 add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles', 20 );
+
