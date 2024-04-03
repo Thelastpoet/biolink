@@ -15,7 +15,7 @@
  * Elementor Pro tested up to: 3.20.2
  */
 
- if ( ! defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
@@ -24,7 +24,7 @@
  */
 function register_bio_link( $widgets_manager ) {
 
-    require_once( __DIR__ . '/widgets/bio-link-container.php' );
+    require_once( __DIR__ . '/widgets/bio-link-widget.php' );
 
     $widgets_manager->register( new \Bio_Link_Widget() );
     

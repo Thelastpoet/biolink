@@ -1,4 +1,13 @@
 <?php
+/**
+ * Bio Link Widget Class
+ *
+ * Implements a custom Elementor widget for displaying bio links.
+ */
+
+ if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
 
 class Bio_Link_Widget extends \Elementor\Widget_Base {
 
