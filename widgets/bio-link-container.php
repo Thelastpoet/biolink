@@ -33,62 +33,6 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
     ];
 
 	protected function _register_controls() {     
-
-        // Remove specific controls from the Advanced tab
-        $this->remove_control('_margin');
-        $this->remove_control('_padding');
-        $this->remove_control('_element_width');
-        $this->remove_control('_element_vertical_align');
-        $this->remove_control('_position');
-        $this->remove_control('_offset_orientation_h');
-        $this->remove_control('_offset_x');
-        $this->remove_control('_offset_x_end');
-        $this->remove_control('_offset_orientation_v');
-        $this->remove_control('_offset_y');
-        $this->remove_control('_offset_y_end');
-        $this->remove_control('_z_index');
-        $this->remove_control('_element_id');
-        $this->remove_control('_css_classes');
-        $this->remove_control('_animation');
-        $this->remove_control('animation_duration');
-        $this->remove_control('_animation_delay');
-        $this->remove_control('_background_background');
-        $this->remove_control('_background_color');
-        $this->remove_control('_background_color_stop');
-        $this->remove_control('_background_color_b');
-        $this->remove_control('_background_color_b_stop');
-        $this->remove_control('_background_gradient_type');
-        $this->remove_control('_background_gradient_angle');
-        $this->remove_control('_background_gradient_position');
-        $this->remove_control('_background_image');
-        $this->remove_control('_background_position');
-        $this->remove_control('_background_attachment');
-        $this->remove_control('_background_repeat');
-        $this->remove_control('_background_size');
-        $this->remove_control('_background_overlay_background');
-        $this->remove_control('_background_overlay_color');
-        $this->remove_control('_background_overlay_color_stop');
-        $this->remove_control('_background_overlay_color_b');
-        $this->remove_control('_background_overlay_color_b_stop');
-        $this->remove_control('_background_overlay_gradient_type');
-        $this->remove_control('_background_overlay_gradient_angle');
-        $this->remove_control('_background_overlay_gradient_position');
-        $this->remove_control('_background_overlay_image');
-        $this->remove_control('_background_overlay_position');
-        $this->remove_control('_background_overlay_attachment');
-        $this->remove_control('_background_overlay_repeat');
-        $this->remove_control('_background_overlay_size');
-        $this->remove_control('_background_overlay_opacity');
-        $this->remove_control('_border_border');
-        $this->remove_control('_border_width');
-        $this->remove_control('_border_color');
-        $this->remove_control('_box_shadow_box_shadow_type');
-        $this->remove_control('_box_shadow_box_shadow');
-        $this->remove_control('_border_radius');
-        $this->remove_control('_viewport_height');
-        $this->remove_control('_custom_attributes');
-        $this->remove_control('_custom_css');
-
         // Content Tab
         // Identity
         $this->start_controls_section(

@@ -39,15 +39,3 @@ function enqueue_widget_styles() {
     wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array( 'elementor-frontend' ), '1.0.0', 'all' );
 }
 add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles', 20 );
-
-/**
- * Remove controls from the Advanced tab
- */
-function remove_advanced_controls( $controls_manager ) {
-
-    $controls_manager->unregister( 'margin' );
-	$controls_manager->unregister( 'padding' );
-
-}
-
-add_action( 'elementor/controls/register', 'remove_advanced_controls' );
