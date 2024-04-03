@@ -24,7 +24,7 @@
  */
 function register_bio_link( $widgets_manager ) {
 
-    require_once( __DIR__ . '/widgets/bio-link-widget.php' );
+    require_once( __DIR__ . '/widgets/bio-link-copy.php' );
 
     $widgets_manager->register( new \Bio_Link_Widget() );
     
@@ -36,6 +36,6 @@ add_action( 'elementor/widgets/register', 'register_bio_link' );
  * Enqueue widget styles
  */
 function enqueue_widget_styles() {
-    wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array(), '1.0.0', 'all' );
+    wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array( 'elementor-frontend' ), '1.0.0', 'all' );
 }
-add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles' );
+add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles', 20 );
