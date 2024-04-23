@@ -2,21 +2,29 @@
 /**
  * Bio Link Widget Class
  *
- * Implements a custom Elementor widget for displaying bio links.
+ * Implements a Link in Bio Widget for displaying bio links.
  */
 
  if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
+use Elementor\Widget_Base;
+use Elementor\Controls_Manager;
+use Elementor\Group_Control_Typography;
+use Elementor\Group_Control_Box_Shadow;
+use Elementor\Group_Control_Background;
+use Elementor\Group_Control_Border;
+use Elementor\Repeater;
+use Elementor\Utils;
 
-class Bio_Link_Widget extends \Elementor\Widget_Base {
+class Bio_Link_Widget extends Widget_Base {
 
 	public function get_name() {
 		return 'bio-link';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Bio Link', 'biolink' );
+		return esc_html__( 'Link in Bio', 'biolink' );
 	}
 
 	public function get_icon() {
@@ -27,10 +35,19 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
 		return [ 'general' ];
 	}
     
+    public function get_custom_help_url() {
+		return '#';
+	}
+
+    // Load Font Awesome 6
+    public function get_style_depends() {
+		return [ 'font-awesome-6', 'biolink-style' ];
+	}
 
     // Selectors for the controls
     protected $selectors = [
         'wrapper' => '{{WRAPPER}} .bio-link-wrapper',
+        'center_vertical' => '{{WRAPPER}} .bio-link-content-center',
         'content' => '{{WRAPPER}} .bio-link-content',
         'image' => '{{WRAPPER}} .bio-link-image img',
         'cover_image' => '{{WRAPPER}} .bio-link-cover-image',
@@ -39,6 +56,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
         'description' => '{{WRAPPER}} .bio-link-description',
         'icon' => '{{WRAPPER}} .bio-link-icon',
         'cta' => '{{WRAPPER}} .bio-link-cta',
+        'biolink-bg' => '{{WRAPPER}} .bio-link-background',
     ];
 
 	protected function _register_controls() {     
@@ -48,7 +66,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'Identity_section',
             [
                 'label' => esc_html__( 'Identity', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
     
@@ -57,7 +75,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'image_style',
                 [
                     'label' => esc_html__( 'Image Style', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'profile' => esc_html__( 'Profile', 'biolink' ),
                         'cover' => esc_html__( 'Cover', 'biolink' ),
@@ -70,9 +88,9 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'choose_image',
                 [
                     'label' => esc_html__( 'Choose Image', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::MEDIA,
+                    'type' => Controls_Manager::MEDIA,
                     'default' => [
-                        'url' => \Elementor\Utils::get_placeholder_image_src(),
+                        'url' => Utils::get_placeholder_image_src(),
                     ],
                 ]
             );
@@ -91,10 +109,11 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'heading',
                 [
                     'label' => esc_html__( 'Heading', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::TEXTAREA,
+                    'type' => Controls_Manager::TEXTAREA,
                     'dynamic' => [
                         'active' => true,
                     ],
+                    'default' => 'Sara Parker',
                 ]
             );
         
@@ -102,7 +121,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'heading_tag',
                 [
                     'label' => esc_html__( 'HTML Tag', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'h1' => 'H1',
                         'h2' => 'H2',
@@ -119,10 +138,11 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'title',
                 [
                     'label' => esc_html__( 'Title or Tagline', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::TEXTAREA,
+                    'type' => Controls_Manager::TEXTAREA,
                     'dynamic' => [
                         'active' => true,
                     ],
+                    'default' => 'Kitchen Chronicles',
                 ]
             );
 
@@ -130,7 +150,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'title_tag',
                 [
                     'label' => esc_html__( 'HTML Tag', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'h1' => 'H1',
                         'h2' => 'H2',
@@ -147,10 +167,11 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'description',
                 [
                     'label' => esc_html__( 'Description', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::TEXTAREA,
+                    'type' => Controls_Manager::TEXTAREA,
                     'dynamic' => [
                         'active' => true,
                     ],
+                    'default' => 'Join me on my journey to a healthier lifestyle',
                 ]
             );
         
@@ -160,53 +181,120 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
         $this->start_controls_section(
             'icons_section',
             [
-                'label' => esc_html__( 'Icons', 'biolink' ),
+                'label' => esc_html__( 'Icons', 'biolink' ),                
             ]
         );
 
-            $repeater = new \Elementor\Repeater();
+            $repeater = new Repeater();
 
             $repeater->add_control(
                 'social_media',
                 [
                     'label' => esc_html__( 'Social Media', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'none' => esc_html__( 'None', 'biolink' ),
+                        'email' => esc_html__('Email', 'biolink'),
+                        'tel' => esc_html__('Tel', 'biolink'),
+                        'telegram' => esc_html__('Telegram', 'biolink'),
+                        'waze' => esc_html__('Waze', 'biolink'),
+                        'whatsapp' => esc_html__('WhatsApp', 'biolink'),
+                        '---' => esc_html__('---', 'biolink'),
                         'facebook' => esc_html__( 'Facebook', 'biolink' ),
-                        'x-twitter' => esc_html__( 'X-Twitter', 'biolink' ),
                         'instagram' => esc_html__( 'Instagram', 'biolink' ),
                         'linkedin' => esc_html__( 'LinkedIn', 'biolink' ),
+                        'pinterest' => esc_html__('Pinterest', 'biolink'),
+                        'tiktok' => esc_html__('TikTok', 'biolink'),
+                        'x-twitter' => esc_html__( 'X-Twitter', 'biolink' ),                       
                         'youtube' => esc_html__( 'YouTube', 'biolink' ),
-                        // We will add more here when I do the checks
+                        '----' => esc_html__('----', 'biolink'),
+                        'appl-music' => esc_html__('Apple Music', 'biolink'),
+                        'behance' => esc_html__('Behance', 'biolink'),
+                        'dribbble' => esc_html__('Dribbble', 'biolink'),
+                        'spotify' => esc_html__('Spotify', 'biolink'),
+                        'soundlouc' => esc_html__('SoundCloud', 'biolink'),
+                        'vimeo' => esc_html__('Vimeo', 'biolink'),
                     ],
                     'default' => 'none',
                 ]
             );
 
+            // For URLS
             $repeater->add_control(
                 'link',
                 [
                     'label' => esc_html__( 'Link', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::URL,
+                    'type' => Controls_Manager::URL,
                     'placeholder' => __( 'https://your-link.com', 'biolink' ),
+                    'dynamic' => [
+                        'active' => true,
+                    ],
                     'show_external' => true,
                     'default' => [
-                        'url' => '',
+                        'url' => '#',
                         'is_external' => true,
                         'nofollow' => true,
                     ],
                 ]
             );
 
+            // For telephone
+            $repeater->add_control(
+                'tel_number',
+                [
+                    'label' => esc_html__('Number', 'biolink'),
+                    'type' => Controls_Manager::TEXT,
+                    'placeholder' => esc_html__( '+1', 'biolink' ),
+                    'dynamic' => [
+                        'active' => true,
+                    ],
+                    'condition' => [
+                        'social_media' => 'tel',
+                    ]
+                ]
+            );
+
+            $this->add_control(
+                'custom_panel_alert',
+                [
+                    'type' => \Elementor\Controls_Manager::ALERT,
+                    'alert_type' => 'info',
+                    'heading' => esc_html__( 'Add up to 5 icons', 'textdomain' ),
+                ]
+            );
+
             $this->add_control(
                 'social_icons',
                 [
-                    'label' => esc_html__( 'Social Icons', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::REPEATER,
+                    'type' => Controls_Manager::REPEATER,
                     'fields' => $repeater->get_controls(),
-                    'default' => [],
-                    'title_field' => '{{{ social_media }}}',
+                    'default' => [
+                        [
+                            'social_media' => 'facebook',
+                            'link' => [
+                                'url' => '#',
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                        ],
+                        [
+                            'social_media' => 'instagram',
+                            'link' => [
+                                'url' => '#',
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                        ],
+                        [
+                            'social_media' => 'tiktok',
+                            'link' => [
+                                'url' => '#',
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                        ],
+                    ],
+                    'title_field' => '{{{ social_media }}}',                  
                 ]
             );
 
@@ -220,13 +308,13 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             ]
         );
     
-            $cta_repeater = new \Elementor\Repeater();
+            $cta_repeater = new Repeater();
         
             $cta_repeater->add_control(
                 'text',
                 [
                     'label' => esc_html__( 'Text', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'type' => Controls_Manager::TEXT,
                     'dynamic' => [
                         'active' => true,
                     ],
@@ -238,11 +326,31 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'link_type',
                 [
                     'label' => esc_html__( 'Link Type', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'url' => esc_html__( 'URL', 'biolink' ),
-                        'phone' => esc_html__( 'Phone', 'biolink' ),
+                        'file-download' => esc_html__( 'File Download', 'biolink'),
+                        '---' => esc_html__('---', 'biolink'),
                         'email' => esc_html__( 'Email', 'biolink' ),
+                        'telphone' => esc_html__( 'Tel', 'biolink' ),
+                        'telegram' => esc_html__('Telegram', 'biolink'),
+                        'waze' => esc_html__('Waze', 'biolink'),
+                        'whatsapp' => esc_html__('WhatsApp', 'biolink'),
+                        '----' => esc_html__('----', 'biolink'),
+                        'facebook' => esc_html__('Facebook', 'biolink'),
+                        'instagram' => esc_html__('Instagram', 'biolink'),
+                        'linkedin' => esc_html__('LinkedIn', 'biolink'),
+                        'pinterest' => esc_html__('Pinterest', 'biolink'),
+                        'tiktok' => esc_html__('TikTok', 'biolink'),
+                        'x-twitter' => esc_html__('X-Twitter', 'biolink'),
+                        'youtube' => esc_html__('YouTube', 'biolink'),
+                        '-----' => esc_html__('-----', 'biolink'),
+                        'apple-music' => esc_html__('Apple Music', 'biolink'),
+                        'behance' => esc_html__('Behance', 'biolink'),
+                        'dribbble' => esc_html__('Dribbble', 'biolink'),
+                        'spotify' => esc_html__('Spotify', 'biolink'),
+                        'soundloucd' => esc_html__('SoundCloud', 'biolink'),
+                        'vimeo' => esc_html__('Vimeo', 'biolink'),                        
                     ],
                     'default' => 'url',
                 ]
@@ -252,7 +360,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'link',
                 [
                     'label' => esc_html__( 'Link', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::URL,
+                    'type' => Controls_Manager::URL,
                     'dynamic' => [
                         'active' => true,
                     ],
@@ -273,16 +381,44 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'cta_links',
                 [
                     'label' => esc_html__( 'CTA Links', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::REPEATER,
+                    'type' => Controls_Manager::REPEATER,
                     'fields' => $cta_repeater->get_controls(),
                     'default' => [
                         [
-                            'text' => esc_html__( 'Click Here', 'biolink' ),
+                            'text' => esc_html__( 'Get Healthy', 'biolink' ),
                             'link' => [
-                                'url' => 'https://your-link.com',
+                                'url' => '#', 
                                 'is_external' => true,
                                 'nofollow' => true,
                             ],
+                            'link_type' => 'url',
+                        ],
+                        [
+                            'text' => esc_html__( 'Top 10 Recipes', 'biolink' ),
+                            'link' => [
+                                'url' => '#', 
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                            'link_type' => 'url',
+                        ],
+                        [
+                            'text' => esc_html__( 'Meal Prep', 'biolink' ),
+                            'link' => [
+                                'url' => '#', 
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                            'link_type' => 'url',
+                        ],
+                        [
+                            'text' => esc_html__( 'Healthy Living Resources', 'biolink' ),
+                            'link' => [
+                                'url' => '#', 
+                                'is_external' => true,
+                                'nofollow' => true,
+                            ],
+                            'link_type' => 'url',
                         ],
                     ],
                     'title_field' => '{{{ text }}}',
@@ -297,7 +433,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'identity_style_section',
             [
                 'label' => esc_html__( 'Identity', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
 
@@ -305,8 +441,8 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             $this->add_responsive_control(
                 'image_size',
                 [
-                    'label' => esc_html__( 'Image Height', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'label' => esc_html__( 'Image Size', 'biolink' ),
+                    'type' => Controls_Manager::SLIDER,
                     'size_units' => [ 'px', '%'  ],
                     'range' => [
                         'px' => [
@@ -333,7 +469,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'image_shape',
                 [
                     'label' => esc_html__( 'Shape', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         '50%' => esc_html__( 'Circle', 'biolink' ),
                         'square' => esc_html__( 'Square', 'biolink' ),
@@ -353,7 +489,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'cover_image_height',
                 [
                     'label' => esc_html__( 'Image Height', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'type' => Controls_Manager::SLIDER,
                     'size_units' => [ 'px', 'vh' ],
                     'range' => [
                         'px' => [
@@ -368,7 +504,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                     ],
                     'default' => [
                         'unit' => 'px',
-                        'size' => 300,
+                        'size' => 170,
                     ],
                     'selectors' => [
                         $this->selectors['cover_image'] => 'height: {{SIZE}}{{UNIT}};',
@@ -381,13 +517,14 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
 
             // Image Border
             $this->add_group_control(
-                \Elementor\Group_Control_Border::get_type(),
+                Group_Control_Border::get_type(),
                 [
                     'name' => 'image_border',
                     'label' => esc_html__( 'Border', 'biolink' ),
                     'selector' => $this->selectors['image'] . ', ' . $this->selectors['cover_image'],
                 ]
             );
+
 
         $this->end_controls_section();
             
@@ -396,7 +533,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'bio_style_section',
             [
                 'label' => esc_html__( 'Bio', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
         
@@ -405,7 +542,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'heading_title',
                 [
                     'label' => esc_html__( 'Heading', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::HEADING,
+                    'type' => Controls_Manager::HEADING,
                 ]
             );
             
@@ -413,8 +550,8 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'heading_text_color',
                 [
                     'label' => esc_html__( 'Text Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
-                    'default' => '#000000',
+                    'type' => Controls_Manager::COLOR,
+                    'default' => '#1C2448',
                     'selectors' => [
                         $this->selectors['heading'] => 'color: {{VALUE}};',
                     ],
@@ -422,18 +559,34 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             );
             
             $this->add_group_control(
-                \Elementor\Group_Control_Typography::get_type(),
+                Group_Control_Typography::get_type(),
                 [
                     'name' => 'heading_typography',
                     'label' => esc_html__( 'Typography', 'biolink' ),
                     'selector' => $this->selectors['heading'],
                     'fields_options' => [
+                        'typography' => ['default' => 'yes'],
+                        'font_family' => [
+                            'default' => 'Poppins',
+                        ],
+                        'font_weight' => [
+                            'default' => '600',
+                        ],
                         'font_size' => [
                             'default' => [
                                 'unit' => 'px',
-                                'size' => 21,
-                            ]
-                        ]
+                                'size' => 36,
+                            ],
+                        ],
+                        'line_height' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 20,
+                            ],
+                        ],
+                        'text_align' => [
+                            'default' => 'center',
+                        ],
                     ]
                 ]
             );
@@ -441,7 +594,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             $this->add_control(
                 'heading_separator',
                 [
-                    'type' => \Elementor\Controls_Manager::DIVIDER,
+                    'type' => Controls_Manager::DIVIDER,
                 ]
             );
             
@@ -450,7 +603,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'subheading_title',
                 [
                     'label' => esc_html__( 'Subheading', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::HEADING,
+                    'type' => Controls_Manager::HEADING,
                 ]
             );
             
@@ -458,8 +611,8 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'subheading_text_color',
                 [
                     'label' => esc_html__( 'Text Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
-                    'default' => '#000000',
+                    'type' => Controls_Manager::COLOR,
+                    'default' => '#1C2448',
                     'selectors' => [
                         $this->selectors['subheading'] => 'color: {{VALUE}};',
                     ],
@@ -467,26 +620,42 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             );
             
             $this->add_group_control(
-                \Elementor\Group_Control_Typography::get_type(),
+                Group_Control_Typography::get_type(),
                 [
                     'name' => 'subheading_typography',
                     'label' => esc_html__( 'Typography', 'biolink' ),
                     'selector' => $this->selectors['subheading'],
                     'fields_options' => [
+                        'typography' => ['default' => 'yes'],
+                        'font_family' => [
+                            'default' => 'Poppins',
+                        ],
+                        'font_weight' => [
+                            'default' => '500',
+                        ],
                         'font_size' => [
                             'default' => [
                                 'unit' => 'px',
-                                'size' => 18,
+                                'size' => 20,
                             ],
                         ],
-                    ],
+                        'line_height' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 20,
+                            ],
+                        ],
+                        'text_align' => [
+                            'default' => 'center',
+                        ],
+                    ]
                 ]
             );
             
             $this->add_control(
                 'subheading_separator',
                 [
-                    'type' => \Elementor\Controls_Manager::DIVIDER,
+                    'type' => Controls_Manager::DIVIDER,
                 ]
             );
             
@@ -495,7 +664,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'description_title',
                 [
                     'label' => esc_html__( 'Description', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::HEADING,
+                    'type' => Controls_Manager::HEADING,
                 ]
             );
             
@@ -503,16 +672,40 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'description_text_color',
                 [
                     'label' => esc_html__( 'Text Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
-                    'default' => '#000000',
+                    'type' => Controls_Manager::COLOR,
+                    'default' => '#324A6D',
                     'selectors' => [
                         $this->selectors['description'] => 'color: {{VALUE}};',
                     ],
+                    'fields_options' => [
+                        'typography' => ['default' => 'yes'],
+                        'font_family' => [
+                            'default' => 'Poppins',
+                        ],
+                        'font_weight' => [
+                            'default' => '300',
+                        ],
+                        'font_size' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 16,
+                            ],
+                        ],
+                        'line_height' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 24,
+                            ],
+                        ],
+                        'text_align' => [
+                            'default' => 'center',
+                        ],
+                    ]
                 ]
             );
             
             $this->add_group_control(
-                \Elementor\Group_Control_Typography::get_type(),
+                Group_Control_Typography::get_type(),
                 [
                     'name' => 'description_typography',
                     'label' => esc_html__( 'Typography', 'biolink' ),
@@ -527,7 +720,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'icons_style_section',
             [
                 'label' => esc_html__( 'Icons', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
 
@@ -536,8 +729,8 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'icons_color',
                 [
                     'label' => esc_html__( 'Icons Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
-                    'default' => '#000000',
+                    'type' => Controls_Manager::COLOR,
+                    'default' => '#1C2448',
                     'selectors' => [
                         $this->selectors['icon'] => 'color: {{VALUE}};',
                     ],
@@ -549,7 +742,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'icons_size',
                 [
                     'label' => esc_html__( 'Icons Size', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'small' => esc_html__( 'Small', 'biolink' ),
                         'medium' => esc_html__( 'Medium', 'biolink' ),
@@ -560,9 +753,9 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                         $this->selectors['icon'] => 'font-size: {{VALUE}};',
                     ],
                     'selectors_dictionary' => [
-                        'small' => '16px',
-                        'medium' => '24px',
-                        'large' => '32px',
+                        'small' => '16.29px',
+                        'medium' => '24.29px',
+                        'large' => '32.29px',
                     ],
                 ]
             );
@@ -574,7 +767,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'cta_links_style_section',
             [
                 'label' => esc_html__( 'CTA Links', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
 
@@ -583,7 +776,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 'cta_links_type',
                 [
                     'label' => esc_html__( 'Type', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         'button' => esc_html__( 'Button', 'biolink' ),
                         'link' => esc_html__( 'Link', 'biolink' ),
@@ -597,20 +790,44 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
 
             // CTA Links Typography
             $this->add_group_control(
-                \Elementor\Group_Control_Typography::get_type(),
+                Group_Control_Typography::get_type(),
                 [
                     'name' => 'cta_links_typography',
                     'label' => esc_html__( 'Typography', 'biolink' ),
                     'selector' => $this->selectors['cta'],
+                    'fields_options' => [
+                        'typography' => ['default' => 'yes'],
+                        'font_family' => [
+                            'default' => 'Poppins',
+                        ],
+                        'font_weight' => [
+                            'default' => '500',
+                        ],
+                        'font_size' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 16,
+                            ],
+                        ],
+                        'line_height' => [
+                            'default' => [
+                                'unit' => 'px',
+                                'size' => 20,
+                            ],
+                        ],
+                        'text_align' => [
+                            'default' => 'center',
+                        ],
+                    ]
                 ]
             );
 
-            // CTA Links Text Color
+            // CTA Links Button Text Color
             $this->add_control(
                 'cta_links_text_color',
                 [
                     'label' => esc_html__( 'Text Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'type' => Controls_Manager::COLOR,
                     'default' => '#ffffff',
                     'selectors' => [
                         $this->selectors['cta'] => 'color: {{VALUE}};',
@@ -618,13 +835,13 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ]
             );
 
-            // CTA Links Background Color
+            // CTA Links Button Background Color
             $this->add_control(
-                'cta_links_background_color',
+                'cta_links_bg_color',
                 [
                     'label' => esc_html__( 'Background Color', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::COLOR,
-                    'default' => '#477ff8',
+                    'type' => Controls_Manager::COLOR,
+                    'default' => '#467FF7',
                     'selectors' => [
                         $this->selectors['cta'] => 'background-color: {{VALUE}};',
                     ],
@@ -634,9 +851,9 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ]
             );
 
-            // CTA Links Border
+            // CTA Links Button Border
             $this->add_group_control(
-                \Elementor\Group_Control_Border::get_type(),
+                Group_Control_Border::get_type(),
                 [
                     'name' => 'cta_links_border',
                     'label' => esc_html__( 'Border', 'biolink' ),
@@ -644,12 +861,12 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ]
             );
 
-            // CTA Links Corners
+            // CTA Links Button Corners
             $this->add_control(
                 'cta_links_corners',
                 [
                     'label' => esc_html__( 'Corners', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
                         '50px' => esc_html__( 'Round', 'biolink' ),
                         '0' => esc_html__( 'Square', 'biolink' ),
@@ -663,12 +880,12 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ]
             );
 
-            // CTA Links Padding
+            // CTA Links Button Padding
             $this->add_control(
                 'cta_links_padding',
                 [
                     'label' => esc_html__( 'Padding', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                    'type' => Controls_Manager::DIMENSIONS,
                     'size_units' => [ 'px', '%', 'em' ],
                     'default' => [
                         'top' => '12',
@@ -686,6 +903,107 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
 
         $this->end_controls_section();
 
+        // Background Section
+        $this->start_controls_section(
+            'background_style_section',
+            [
+                'label' => esc_html__( 'Background', 'biolink' ),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+            // Background Type
+            $this->add_group_control(
+                Group_Control_Background::get_type(),
+                [
+                    'name' => 'background',
+                    'types' => [ 'classic', 'gradient' ],
+                ]
+            );
+            // Divider
+            $this->add_control(
+                'hr',
+                [
+                    'type' => \Elementor\Controls_Manager::DIVIDER,
+                ]
+            );
+        
+            // Background Overlay Type Control
+            $this->add_group_control(
+                Group_Control_Background::get_type(),
+                [
+                    'name' => 'background_overlay',
+                    'label' => esc_html__('Background Overlay', 'biolink'),
+                    'types' => [ 'classic', 'gradient' ],
+                    'fields_options' => [
+                        'background' => [
+                            'label' => esc_html__('Background Overlay', 'biolink'),
+                        ],                        
+                    ]
+                ]
+            );
+        
+            // Overlay Opacity Control
+            $this->add_control(
+                'overlay_opacity',
+                [
+                    'label' => esc_html__('Overlay Opacity', 'biolink'),
+                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'range' => [
+                        'px' => [
+                            'min' => 0,
+                            'max' => 1,
+                            'step' => 0.05,
+                        ],
+                    ],
+                    'selectors' => [
+                        $this->selectors['wrapper'] => 'opacity: {{SIZE}};',
+                    ],
+                    'condition' => [
+                        'background_overlay!' => 'none',
+                    ],
+                ]
+            );
+        
+        $this->end_controls_section();
+
+        // Border Section
+        $this->start_controls_section(
+            'border_style_section',
+            [
+                'label' => esc_html__( 'Border', 'biolink' ),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+        
+            // Border Enable Switch
+            $this->add_control(
+                'bio_link_border',
+                [
+                    'label' => esc_html__( 'Border', 'biolink' ),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => esc_html__( 'Yes', 'biolink' ),
+                    'label_off' => esc_html__( 'No', 'biolink' ),
+                    'return_value' => 'yes',
+                    'default' => 'no',
+                ]
+            );
+        
+            // Border Width
+            $this->add_group_control(
+                Group_Control_Border::get_type(),
+                [
+                    'name' => 'border',
+                    'label' => esc_html__('Border', 'biolink'),
+                    'selector' => $this->selectors['wrapper'],
+                    'condition' => [
+                        'bio_link_border' => 'yes',
+                    ],
+                ]
+                );
+            
+        $this->end_controls_section();
+        
         
         // Advanced Tab
         // Layout section controls
@@ -693,32 +1011,29 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'advanced_section',
             [
                 'label' => esc_html__( 'Layout', 'biolink' ),
-                'tab' => \Elementor\Controls_Manager::TAB_ADVANCED,
+                'tab' => Controls_Manager::TAB_ADVANCED,
             ]
         );
-
+        
             // Full Width
             $this->add_control(
                 'full_width',
                 [
                     'label' => esc_html__( 'Full Width', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'type' => Controls_Manager::SWITCHER,
                     'label_on' => esc_html__( 'Yes', 'biolink' ),
                     'label_off' => esc_html__( 'No', 'biolink' ),
                     'return_value' => 'yes',
                     'default' => 'no',
-                    'selectors' => [
-                        $this->selectors['wrapper'] => 'width: 100%;',
-                    ],
                 ]
             );
-
-            // Content Width (when Full Width is Yes)
+        
+            // Content Width (only visible if Full Width is Yes)
             $this->add_control(
                 'content_width_full',
                 [
                     'label' => esc_html__( 'Content Width', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'type' => Controls_Manager::SLIDER,
                     'size_units' => [ 'px', '%' ],
                     'range' => [
                         'px' => [
@@ -733,7 +1048,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                     ],
                     'default' => [
                         'unit' => 'px',
-                        'size' => 280,
+                        'size' => 500,
                     ],
                     'selectors' => [
                         $this->selectors['content'] => 'max-width: {{SIZE}}{{UNIT}};',
@@ -743,13 +1058,13 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                     ],
                 ]
             );
-
-            // Full Screen Height
+        
+            // Full Screen Height (only visible if Full Width is Yes)
             $this->add_control(
                 'full_screen_height',
                 [
                     'label' => esc_html__( 'Full Screen Height', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'type' => Controls_Manager::SWITCHER,
                     'label_on' => esc_html__( 'Yes', 'biolink' ),
                     'label_off' => esc_html__( 'No', 'biolink' ),
                     'return_value' => 'yes',
@@ -760,9 +1075,9 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                 ]
             );
 
-            // Apply Full Screen Height On
+            // Apply Full Screen Height On (only visible if Full Screen Height is Yes)
             $this->add_control(
-                'full_screen_height_on',
+                'apply_full_screen_height_on',
                 [
                     'label' => esc_html__( 'Apply Full Screen Height On', 'biolink' ),
                     'type' => \Elementor\Controls_Manager::SELECT2,
@@ -774,18 +1089,18 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                     ],
                     'default' => [ 'desktop', 'tablet', 'mobile' ],
                     'condition' => [
-                        'full_width' => 'yes',
                         'full_screen_height' => 'yes',
+                        'full_width' => 'yes', 
                     ],
                 ]
             );
-
-            // Jumbo Width
+        
+            // Jumbo Width (only visible if Full Width is No)
             $this->add_control(
                 'jumbo_width',
                 [
                     'label' => esc_html__( 'Jumbo Width', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'type' => Controls_Manager::SLIDER,
                     'size_units' => [ 'px', '%' ],
                     'range' => [
                         'px' => [
@@ -803,17 +1118,20 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                         'size' => 360,
                     ],
                     'selectors' => [
-                        $this->selectors['wrapper'] => 'max-width: {{SIZE}}{{UNIT}};',
+                        $this->selectors['wrapper'] => 'width: {{SIZE}}{{UNIT}};',
+                    ],
+                    'condition' => [
+                        'full_width!' => 'yes',
                     ],
                 ]
             );
-
-            // Content Width
+        
+            // Content Width (only visible if Full Width is No)
             $this->add_control(
                 'content_width',
                 [
                     'label' => esc_html__( 'Content Width', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SLIDER,
+                    'type' => Controls_Manager::SLIDER,
                     'size_units' => [ 'px', '%' ],
                     'range' => [
                         'px' => [
@@ -833,33 +1151,40 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                     'selectors' => [
                         $this->selectors['content'] => 'max-width: {{SIZE}}{{UNIT}};',
                     ],
+                    'condition' => [
+                        'full_width!' => 'yes',
+                    ],
                 ]
             );
-
-            // Center Vertical
+        
+            // Center Vertical (only visible if Full Width is No)
             $this->add_control(
                 'center_vertical',
                 [
                     'label' => esc_html__( 'Center Vertical', 'biolink' ),
-                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'type' => Controls_Manager::SWITCHER,
                     'label_on' => esc_html__( 'Yes', 'biolink' ),
                     'label_off' => esc_html__( 'No', 'biolink' ),
                     'return_value' => 'yes',
-                    'default' => 'no',
+                    'default' => 'yes',
                     'selectors' => [
-                        $this->selectors['content'] => 'display: flex; align-items: center;',
+                        $this->selectors['content'] => 'display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center;',
+                    ],
+                    'condition' => [
+                        'full_width!' => 'yes',
                     ],
                 ]
             );
-
+        
         $this->end_controls_section();
+        
 
         // Custom Section
         $this->start_controls_section(
             'custom_section',
             [
                 'label' => esc_html__('Custom', 'biolink'),
-                'tab' => \Elementor\Controls_Manager::TAB_ADVANCED,
+                'tab' => Controls_Manager::TAB_ADVANCED,
             ]
         );
 
@@ -868,7 +1193,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'css_id',
             [
                 'label' => esc_html__( 'CSS ID', 'biolink' ),
-                'type' => \Elementor\Controls_Manager::TEXT,
+                'type' => Controls_Manager::TEXT,
                 'dynamic' => [
                     'active' => true,
                 ],
@@ -883,7 +1208,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'css_classes',
             [
                 'label' => esc_html__( 'CSS Classes', 'biolink' ),
-                'type' => \Elementor\Controls_Manager::TEXT,
+                'type' => Controls_Manager::TEXT,
                 'dynamic' => [
                     'active' => true,
                 ],
@@ -897,7 +1222,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'custom_css',
             [
                 'label' => esc_html__( 'Custom CSS', 'biolink' ),
-                'type' => \Elementor\Controls_Manager::CODE,
+                'type' => Controls_Manager::CODE,
                 'language' => 'css',
                 'rows' => 20,
                 'separator' => 'before',
@@ -909,7 +1234,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
             'custom_attributes',
             [
                 'label' => esc_html__( 'Custom Attributes', 'biolink' ),
-                'type' => \Elementor\Controls_Manager::TEXTAREA,
+                'type' => Controls_Manager::TEXTAREA,
                 'dynamic' => [
                     'active' => true,
                 ],
@@ -921,7 +1246,6 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
     
         $this->end_controls_section();
     }
-
 
     protected function render() {
         $settings = $this->get_settings_for_display();
@@ -958,13 +1282,15 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
     
         ?>
         <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+            <?php if ( 'cover' === $settings['image_style'] && $image_url ) : ?>
+                <div <?php echo $this->get_render_attribute_string( 'cover_image' ); ?>>
+                    <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $heading ); ?>">
+                </div>
+            <?php endif; ?>
+
             <div <?php echo $this->get_render_attribute_string( 'content' ); ?>>
                 <?php if ( 'profile' === $settings['image_style'] && $image_url ) : ?>
                     <div <?php echo $this->get_render_attribute_string( 'image' ); ?>>
-                        <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $heading ); ?>">
-                    </div>
-                <?php elseif ( 'cover' === $settings['image_style'] && $image_url ) : ?>
-                    <div <?php echo $this->get_render_attribute_string( 'cover_image' ); ?>>
                         <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $heading ); ?>">
                     </div>
                 <?php endif; ?>
@@ -995,7 +1321,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                             ?>
                             <a <?php echo $this->get_render_attribute_string( $link_key ); ?> class="bio-link-icon <?php echo esc_attr( $icon_class ); ?>">
                                 <?php if ( 'none' !== $item['social_media'] ) : ?>
-                                    <i class="fab fa-<?php echo esc_attr( $item['social_media'] ); ?>"></i>
+                                    <i class="fa-brands fa-<?php echo esc_attr( $item['social_media'] ); ?>"></i>
                                 <?php endif; ?>
                             </a>
                         <?php endforeach; ?>
@@ -1055,13 +1381,15 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
         #>
     
         <div {{{ view.getRenderAttributeString( 'wrapper' ) }}}>
+            <# if ( 'cover' === settings.image_style && image_url ) { #>
+                <div {{{ view.getRenderAttributeString( 'cover_image' ) }}}>
+                    <img src="{{ image_url }}" alt="{{ heading }}">
+                </div>
+            <# } #>
+
             <div {{{ view.getRenderAttributeString( 'content' ) }}}>
                 <# if ( 'profile' === settings.image_style && image_url ) { #>
                     <div {{{ view.getRenderAttributeString( 'image' ) }}}>
-                        <img src="{{ image_url }}" alt="{{ heading }}">
-                    </div>
-                <# } else if ( 'cover' === settings.image_style && image_url ) { #>
-                    <div {{{ view.getRenderAttributeString( 'cover_image' ) }}}>
                         <img src="{{ image_url }}" alt="{{ heading }}">
                     </div>
                 <# } #>
@@ -1091,7 +1419,7 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
                         #>
                             <a {{{ view.getRenderAttributeString( link_key ) }}}>
                                 <# if ( 'none' !== item.social_media ) { #>
-                                    <i class="fab fa-{{ item.social_media }}"></i>
+                                    <i class="fa-brands fa-{{ item.social_media }}"></i>
                                 <# } #>
                             </a>
                         <# } ); #>
@@ -1116,4 +1444,3 @@ class Bio_Link_Widget extends \Elementor\Widget_Base {
         <?php
     }
 }
-

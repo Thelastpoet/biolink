@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function register_bio_link( $widgets_manager ) {
 
-    require_once( __DIR__ . '/widgets/bio-link-widget.php' );
+    require_once( __DIR__ . '/widgets/bio-link-container.php' );
 
     $widgets_manager->register( new \Bio_Link_Widget() );
     
@@ -32,11 +32,25 @@ function register_bio_link( $widgets_manager ) {
 
 add_action( 'elementor/widgets/register', 'register_bio_link' );
 
-/**
- * Enqueue widget styles
- */
-function enqueue_widget_styles() {
-    wp_enqueue_style( 'biolink-style', plugins_url( 'assets/css/bio-link.css', __FILE__ ), array( 'elementor-frontend' ), '1.0.0', 'all' );
-}
-add_action( 'wp_enqueue_scripts', 'enqueue_widget_styles', 20 );
 
+/**
+ * Remove controls that come by default with Elementor
+ */
+
+function unregister_controls( $controls_manager ) {
+    $controls_manager->unregister( '_position' );
+}
+
+add_action( 'elementor/controls/register', 'unregister_controls' );
+
+/**
+ * Register Scripts and Styles for Bio Link Widget
+ */
+function bio_link_dependancies() {
+    wp_register_style( 'biolink-style', plugins_url('assets/css/bio-link.css', __FILE__) );
+
+    // Add Font Awesome 6
+    wp_register_style( 'font-awesome-6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css', array(), '6.5.2' );
+    
+}
+add_action( 'wp_enqueue_scripts', 'bio_link_dependancies' );

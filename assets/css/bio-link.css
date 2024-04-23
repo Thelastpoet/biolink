@@ -2,33 +2,29 @@
 .bio-link-wrapper {
   display: flex;
   justify-content: center;
-  padding: 20px
+  align-items: center;
+  flex-direction: column;
 }
 
 .bio-link-content-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  width: 100%;
 }
 
-.bio-link-content-center .bio-link-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Cover Image */
+.bio-link-cover-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 30px;
 }
 
-.bio-link-content-center .bio-link-social-icons {
-  display: flex;
-  justify-content: center;
+.bio-link-cover-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
-
-.bio-link-content-center .bio-link-cta-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 
 /* button length */
 .bio-link-cta {
@@ -36,46 +32,39 @@
   text-align: center;
 }
 
+.bio-link-social-icons {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
 
+.bio-link-social-icons .bio-link-icon {
+  margin: 0 5px;
+}
 
-  .bio-link-social-icons {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-
-  .bio-link-social-icons .bio-link-icon {
-    margin: 0 5px;
-  }
-
- 
-  /* Vertical CTA Links */
-  .bio-link-cta-buttons-vertical {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .bio-link-cta-buttons-vertical .bio-link-cta {
-    margin-bottom: 10px;
-    text-align: center;
-    padding: 10px;
-    text-decoration: none;
-  }
-  
-/* Full width control */
-.bio-link-full-width {
+/* Vertical CTA Links */
+.bio-link-cta-buttons-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
 }
 
-.bio-link-full-width .bio-link-content {
-  max-width: 100%;
+.bio-link-cta-buttons-vertical .bio-link-cta {
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  text-decoration: none;
 }
 
-/* Heading and Subheding */
+/* Heading and Subheading */
 .bio-link-heading-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 1px !important;
+  gap: 10px;
+}
+
+.bio-link-heading-wrapper h1 {
+  margin-top: 40px;
+  margin-bottom: 2px;
 }
